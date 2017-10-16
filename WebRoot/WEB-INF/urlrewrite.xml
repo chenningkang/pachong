@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE urlrewrite
+    PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+    "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+<!-- <urlrewrite> -->
+<!--     <rule> -->
+<!--         <from>^/web/content/more/list_([0-9]+).html$</from> -->
+<!--         <to>/web/content/more/$1</to> -->
+<!--     </rule> -->
+<!--     <outbound-rule> -->
+<!--         <from>^/web/content/more/([0-9]+)$</from> -->
+<!--         <to>/web/content/more/list_$1.html</to> -->
+<!--     </outbound-rule> -->
+<!-- </urlrewrite> -->
+<!-- <urlrewrite> -->
+<!--     <rule> -->
+<!--         <from>^/([a-z]+)/content/more/list_([0-9]+).html$</from> -->
+<!--         <to>/$1/content/more/$2</to> -->
+<!--     </rule> -->
+<!--     <outbound-rule> -->
+<!--         <from>^/([a-z]+)/content/more/([0-9]+)$</from> -->
+<!--         <to>/$1/content/more/list_$2.html</to> -->
+<!--     </outbound-rule> -->
+<!-- </urlrewrite> -->
+
+
+<urlrewrite>
+    <rule>
+        <from>^/([a-z]+)/content/([a-z]+)/([a-z]+)_([0-9]+).html$</from>
+        <to>/$1/content/$2/$4</to>
+    </rule>
+    <outbound-rule>
+        <from>^/([a-z]+)/content/([a-z]+)/([0-9]+)$</from>
+        <to>/$1/content/$2/$2_$3.html</to>
+    </outbound-rule>
+</urlrewrite>

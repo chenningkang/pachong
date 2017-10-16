@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context 
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/util 
+       http://www.springframework.org/schema/util/spring-util-3.0.xsd 
+       http://www.springframework.org/schema/mvc 
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/task  
+       http://www.springframework.org/schema/task/spring-task-3.0.xsd
+      ">
+     
+     <mvc:default-servlet-handler />
+     <!-- mvc:resources 资源文件的处理. -->
+	 <!-- <mvc:resources location="/resources/" mapping="/resources/**"></mvc:resources>  -->
+     <mvc:annotation-driven validator="validator">
+	    <mvc:message-converters register-defaults="true">
+        <bean class="com.moxi.core.UTF8StringHttpMessageConverter">
+        	<property name="supportedMediaTypes">
+        		<list>  
+                    <value>text/plain;charset=UTF-8</value>  
+                    <value>text/html;charset=UTF-8</value>  
+                    <value>application/json;charset=UTF-8</value>  
+                </list>  
+        	</property>
+        </bean> 
+		<bean class="org.springframework.http.converter.BufferedImageHttpMessageConverter"/>
+		<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/> 
+        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        	<property name="prefixJson" value="false" />
+        	<property name="objectMapper">
+        		 <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                       <!-- 处理responseBody 里面日期类型 --> 
+                       <property name="dateFormat">  
+                           <bean class="java.text.SimpleDateFormat">  
+                               <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
+                           </bean>  
+                       </property> 
+                       <!-- 为null字段时不显示 -->
+                       <property name="serializationInclusion">
+                           <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+                       </property> 
+                   </bean>  
+        	</property>
+        	 <property name="supportedMediaTypes">  
+                <list>  
+                    <value>application/json;charset=UTF-8</value>  
+                    <value>application/x-www-form-urlencoded;charset=UTF-8</value>  
+                </list>  
+            </property>
+        </bean>
+    </mvc:message-converters> 
+	</mvc:annotation-driven>
+	
+	<!-- 验证声明 -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass"  value="org.hibernate.validator.HibernateValidator"/>
+		<!--不设置则默认为classpath下的 ValidationMessages.properties -->
+        <property name="validationMessageSource" ref="validatemessageSource"/>
+    </bean>
+    
+    <!-- 读取验证的资源文件 ,为要要用资源文件：就是是方便统一管理-->
+  	<bean id="validatemessageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">   
+         <property name="basename" value="classpath:validatemessages"/>   
+         <property name="fileEncodings" value="utf-8"/>   
+         <property name="cacheSeconds" value="120"/>   
+    </bean>
+	
+	 
+	<!-- 扫包 -->
+    <context:component-scan base-package="com.moxi.web"></context:component-scan>
+    
+    <!-- 配置后台拦截器 -->
+     <mvc:interceptors>
+      	<mvc:interceptor>
+      		<mvc:mapping path="/admin/**"/>
+      		<bean class="com.moxi.core.LoginIntercetor"></bean>
+      	</mvc:interceptor>
+     </mvc:interceptors>
+     
+     <!-- 全路径 -->
+     <bean id="path" class="com.moxi.core.BasePathExpsoer" init-method="init">
+<!--      	<property name="rootPath" value="http://www.tanzhouedu.com/file"></property> -->
+     </bean>
+      
+     <!-- 视图渲染 -->
+     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+     	<!-- 指定页面存放的路径 -->
+     	<property name="prefix" value="/WEB-INF/pages/"></property>
+     	<!-- 文件的后缀 -->
+     	<property name="suffix" value=".jsp"></property>
+     </bean> 
+     
+     <!-- 文件上传的配置 1kb=1024byte 1MB = 1024KB-->
+     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+     	<!-- 限制文件上大小，单位是:字节 -->
+     	<property name="maxUploadSize" value="5242880000"></property>
+     	<!-- 请求编码的格式 -->
+     	<property name="defaultEncoding" value="UTF-8"></property>
+     	<!-- 上传的临时目录的制定 -->
+     	<property name="uploadTempDir" value="upload/temp/"></property>
+     </bean>
+     
+     <!-- 统一异常处理 -->
+     <bean id="handlerExceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+     	<property name="exceptionMappings">
+     		<props>
+     			<prop key="java.lang.RuntimeException">forward:/error.jsp</prop>
+     		</props>
+     	</property>
+     </bean>
+     
+     <task:executor id="executor" pool-size="5" />  
+     <task:scheduler id="scheduler" pool-size="10" />  
+     <task:annotation-driven executor="executor" scheduler="scheduler" />
+</beans>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis="http://mybatis.org/schema/mybatis-spring" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+			http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+			http://www.springframework.org/schema/task  http://www.springframework.org/schema/task/spring-task-3.1.xsd ">
+			
+	<!-- 扫dao包 -->
+	<context:component-scan base-package="com.moxi.dao"></context:component-scan>
+	<!-- 扫service包 -->
+	<context:component-scan base-package="com.moxi.service"></context:component-scan>
+	
+	<!-- 引入数据的db资源文件 -->
+	<bean class="com.moxi.core.des.EncryptPropertyPlaceholderConfigurer"
+		p:location="classpath:db/db.properties" p:fileEncoding="utf-8" />
+		
+	<!--数据库连接-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    	<!-- 基本属性 url、user、password -->
+    	<property name="driverClassName" value="${db.driver}"></property> 
+	    <property name="url" value="${db.url}" />
+	    <property name="username" value="${db.username}"/>
+	    <property name="password" value="${db.password}"/>
+		<!-- 配置初始化大小、最小、最大 几千并发量  50-->
+		<property name="initialSize"><value>30</value></property>
+	    <property name="maxActive"><value>150</value></property>
+	    <property name="minIdle"><value>15</value></property>
+	    <!-- 配置获取连接等待超时的时间  maxWait: 超时等待时间以毫秒为单位 1000等于60秒-->
+	    <property name="maxWait"><value>60000</value></property>
+	    <!-- 配置监控统计拦截的filters -->
+	    <property name="filters"><value>stat</value></property>
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+	    <property name="timeBetweenEvictionRunsMillis"><value>60000</value></property>
+	    <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+	    <property name="minEvictableIdleTimeMillis"><value>300000</value></property>
+ 	</bean>
+ 	
+ 	<!-- mybatis配置 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 映射所有的sql对应的模块的xml文件 -->
+        <property name="mapperLocations" value="classpath:com/moxi/dao/*/*/*.xml"></property>
+        <!-- 注册mybatisbean别名 -->
+        <property name="typeAliasesPackage" value="com.moxi.model"></property>
+        <!-- 加载mybatis住配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+    </bean> 
+    
+	<!--mybatis的mapper转换器 也就是说的接口，里面原理是采用的jdk的动态代理实现的-->
+  	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+  		<property name="basePackage" value="com.moxi.dao"></property> 
+  	</bean> 
+  	
+  	
+  	<!-- 定时任务相关配置 -->
+	 <task:executor id="executor" pool-size="10" queue-capacity="128"/>
+	 <task:scheduler id="scheduler" pool-size="10"/>
+	 <task:annotation-driven executor="executor" scheduler="scheduler" proxy-target-class="true"/>
+  	
+  	
+
+</beans>

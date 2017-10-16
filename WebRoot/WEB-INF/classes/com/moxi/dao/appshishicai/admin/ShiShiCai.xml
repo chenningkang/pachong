@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.moxi.dao.appshishicai.admin.IShiShiCaiMapper" >
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from app_shishicai
+    where type_id = #{typeId,jdbcType=INTEGER}
+  </delete>
+  <insert id="savepachong"  useGeneratedKeys="true" keyProperty="id" parameterType="ShiShiCai" >
+    insert into app_shishicai ( type_id, 
+      contents)
+    values ( #{typeId,jdbcType=INTEGER}, 
+      #{contents,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="ShiShiCai" >
+    insert into app_shishicai
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="typeId != null" >
+        type_id,
+      </if>
+      <if test="contents != null" >
+        contents,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="contents != null" >
+        #{contents,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+    <select id="selectTypeId"  parameterType="java.lang.Integer"  resultType="java.lang.Integer">
+    select 
+   	count(*)
+    from app_shishicai
+    where type_id = #{typeId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectType"  parameterType="java.lang.Integer"  resultType="ShiShiCai">
+    select 
+   	*
+    from app_shishicai
+    where type_id = #{typeId,jdbcType=INTEGER}
+  </select>
+  
+  
+</mapper>
