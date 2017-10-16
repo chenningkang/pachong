@@ -35,7 +35,6 @@ public class BasePathExpsoer  implements ServletContextAware{
 	}
 
 	public void setRootPath(String rootPath) {
-		
 		this.rootPath = rootPath;
 	}
 	
