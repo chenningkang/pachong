@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -21,6 +21,44 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    This is my JSP page. <br>
+    <form  >
+    	<td>
+    		<input type="hidden" name="post_id" value="1" />
+            <input type="hidden" name="type" value="pk10" />
+    	 
+    	</td>
+    
+    </form>
   </body>
+  <script>
+  //定时获取冠军数据
+  ajax_index();
+      //  setInterval(ajax_index,5000);
+
+		function ajax_index(type){
+			alert(123);
+		  var post_id = $("input[name=post_id]").val();
+		  var type = type?type:$("input[name=type]").val();
+		   // console.log(post_id);
+		  $.ajax({
+		      url: "http://caipiaotj.com/index.php/Home/Pk10/ajax_index",
+		      type: "POST",
+				dataType: 'JSON',
+				crossDomain: true,  
+		      data:{id:post_id,type:type},
+		        success: function (data) {
+		
+					 
+					  console.log(data.count);
+		
+		
+		
+		         
+		
+		      }
+		  });
+		}
+		  
+  </script>
+  
 </html>
